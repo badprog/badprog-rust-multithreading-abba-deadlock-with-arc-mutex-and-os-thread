@@ -1,0 +1,35 @@
+{
+  // badprog.com
+  "name": "${localWorkspaceFolderBasename}",
+  "build": {
+    "context": "..",
+    "dockerfile": "Dockerfile"
+  },
+  "remoteUser": "badprogUser",
+  "workspaceFolder": "/workspaces/badprog-rust",
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspaces/badprog-rust,type=bind",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "rust-lang.rust-analyzer",
+        "tamasfe.even-better-toml",
+        "fill-labs.dependi",
+        "vadimcn.vscode-lldb"
+      ],
+      "settings": {
+        "rust-analyzer.check.command": "clippy",
+        "editor.formatOnSave": true,
+        "[rust]": {
+          "editor.defaultFormatter": "rust-lang.rust-analyzer"
+        },
+        "terminal.integrated.defaultProfile.linux": "bash",
+        "files.insertFinalNewline": true, // Recommended for Buildroot patches and config files
+        "workbench.colorCustomizations": {
+          "statusBarItem.remoteBackground": "#ce16f3",
+          "statusBar.background": "#0d22db"
+        }
+      }
+    }
+  },
+  "postCreateCommand": "rustc --version && cargo --version && cargo clippy --version && cargo fmt --version"
+}

@@ -1,0 +1,22 @@
+# badprog.com
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: dtolnay/rust-toolchain@1.96.0
+        with:
+          components: clippy, rustfmt
+      - name: Check formatting
+        run: cargo fmt --check
+      - name: Run clippy
+        run: cargo clippy --all-targets -- -D warnings
+      - name: Run tests
+        run: cargo test

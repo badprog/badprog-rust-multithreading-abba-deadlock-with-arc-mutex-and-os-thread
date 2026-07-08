@@ -1,0 +1,10 @@
+# badprog.com
+[package]
+name = "deadlock-abba"
+version = "0.1.0"
+edition = "2024"
+description = "Demonstrate the mechanism behind the deadlock ABBA pattern."
+license = "MIT"
+authors = ["badprog.com"]
+
+[dependencies]
