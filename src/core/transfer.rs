@@ -232,30 +232,6 @@ mod ut {
             ];
             let deadlock_mode = false;
             let arc_to_share = Arc::new(devices);
-            let from = DeviceKind::Spi;
-            let to = DeviceKind::I2c;
-
-            // create thread
-            let jh = create_thread(&arc_to_share, from, to, deadlock_mode);
-            jh.join().unwrap(); // wait the thread to finish
-
-            // lock i2c device
-            let guard_for_i2c = arc_to_share[0].lock().unwrap();
-            //
-            assert_eq!(guard_for_i2c.read_register(Device::REG_TO_READ), 0xAA);
-            assert_eq!(guard_for_i2c.read_register(Device::REG_TO_WRITE), 0xCC);
-            assert!(guard_for_i2c.to_string().ends_with("[1000]"));
-            assert!(guard_for_i2c.to_string().contains("I2C"));
-        }
-
-        #[test]
-        fn ok_from_spi_to_i2c() {
-            let devices = vec![
-                Mutex::new(Device::new("SPI", [0x00, 0xAA, 0xBB])),
-                Mutex::new(Device::new("I2C", [0x01, 0xCC, 0xDD])),
-            ];
-            let deadlock_mode = false;
-            let arc_to_share = Arc::new(devices);
             let from = DeviceKind::I2c;
             let to = DeviceKind::Spi;
 
@@ -263,13 +239,37 @@ mod ut {
             let jh = create_thread(&arc_to_share, from, to, deadlock_mode);
             jh.join().unwrap(); // wait the thread to finish
 
-            // lock spi device
+            // lock spi device (destination)
             let guard_for_spi = arc_to_share[1].lock().unwrap();
             //
             assert_eq!(guard_for_spi.read_register(Device::REG_TO_READ), 0xCC);
             assert_eq!(guard_for_spi.read_register(Device::REG_TO_WRITE), 0xAA);
             assert!(guard_for_spi.to_string().ends_with("[1000]"));
             assert!(guard_for_spi.to_string().contains("SPI"));
+        }
+
+        #[test]
+        fn ok_from_spi_to_i2c() {
+            let devices = vec![
+                Mutex::new(Device::new("I2C", [0x00, 0xAA, 0xBB])),
+                Mutex::new(Device::new("SPI", [0x01, 0xCC, 0xDD])),
+            ];
+            let deadlock_mode = false;
+            let arc_to_share = Arc::new(devices);
+            let from = DeviceKind::Spi;
+            let to = DeviceKind::I2c;
+
+            // create thread
+            let jh = create_thread(&arc_to_share, from, to, deadlock_mode);
+            jh.join().unwrap(); // wait the thread to finish
+
+            // lock i2c device (destination)
+            let guard_for_i2c = arc_to_share[0].lock().unwrap();
+            //
+            assert_eq!(guard_for_i2c.read_register(Device::REG_TO_READ), 0xAA);
+            assert_eq!(guard_for_i2c.read_register(Device::REG_TO_WRITE), 0xCC);
+            assert!(guard_for_i2c.to_string().ends_with("[1000]"));
+            assert!(guard_for_i2c.to_string().contains("I2C"));
         }
 
         #[test]
