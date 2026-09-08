@@ -90,6 +90,26 @@ pub fn create_thread(
 }
 
 // ------------------------------------
+// show_content
+// Display elements in the Arc smart pointer
+// ------------------------------------
+fn show_content(arc_to_share: &Arc<Vec<Mutex<Device>>>) {
+    //
+    for mutex_device in arc_to_share.iter() {
+        let result_guard = mutex_device.lock();
+        match result_guard {
+            Ok(guard) => {
+                println!("guard = {guard}");
+            }
+            Err(poisoned_error) => {
+                let guard = poisoned_error.into_inner();
+                println!("guard poisoned = {guard}");
+            }
+        }
+    }
+}
+
+// ------------------------------------
 // run
 // ------------------------------------
 pub fn run(args: &[String]) {
@@ -104,11 +124,8 @@ pub fn run(args: &[String]) {
     //
     println!("At the beginning:");
 
-    // Display elements in the container with raw data
-    for mutexed_device in arc_to_share.iter() {
-        let guard = mutexed_device.lock().unwrap();
-        println!("guard = {guard}");
-    }
+    // // Display elements in the container with raw data
+    show_content(&arc_to_share);
 
     // jh = JoinHandle<T> where T is the type returned by the closure in the thread.
     // In our case, the thread only loop, so returns the unit type "()" meaning void
@@ -140,10 +157,7 @@ pub fn run(args: &[String]) {
     println!("At the end:");
 
     // Display elements in the container with modified data
-    for mutexed_device in arc_to_share.iter() {
-        let guard = mutexed_device.lock().unwrap();
-        println!("guard = {guard}");
-    }
+    show_content(&arc_to_share);
 }
 
 // ------------------------------------
