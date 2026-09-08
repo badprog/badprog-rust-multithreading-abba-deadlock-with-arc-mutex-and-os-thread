@@ -149,7 +149,10 @@ pub fn run(args: &[String]) {
 
     // Wait for all threads to finish.
     for jh in handles {
-        jh.join().unwrap(); // .join() blocks until the current jh (thread) has finished
+        if let Err(err) = jh.join() {
+            // .join() blocks until the current jh (thread) has finished
+            println!("Error during join: {:?}", err);
+        }
     }
     // This line is reached only if all threads have finished.
 
